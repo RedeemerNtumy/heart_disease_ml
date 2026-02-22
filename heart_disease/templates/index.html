@@ -844,7 +844,7 @@ async function submitForm() {
 
   // Simulate async model call (replace with real fetch)
   await new Promise(r => setTimeout(r, 1400));
-  const res = await fetch('http://127.0.0.1:5000/predict', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({features: values}) });
+  const res = await fetch('https://heart-disease-ml-oaz7.onrender.com/predict', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({features: values}) });
   const { probability: prob } = await res.json();
   const info = riskInfo(prob);
 
