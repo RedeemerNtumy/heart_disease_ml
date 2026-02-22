@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HeartCheck — Know Your Heart Health</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f4;
+    --surface: #ffffff;
+    --text: #1a1208;
+    --muted: #7c7060;
+    --accent: #c0392b;
+    --accent-warm: #e67e22;
+    --accent-safe: #27ae60;
+    --border: #e8e0d6;
+    --card-shadow: 0 4px 24px rgba(26,18,8,0.08);
+    --radius: 18px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ——— HERO ——— */
+  .hero {
+    text-align: center;
+    padding: 80px 24px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, #fde8e6 0%, transparent 70%);
+    z-index: 0;
+  }
+  .hero-pill {
+    display: inline-block;
+    background: #fde8e6;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    position: relative; z-index: 1;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 6vw, 64px);
+    line-height: 1.1;
+    color: var(--text);
+    position: relative; z-index: 1;
+    margin-bottom: 18px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero p {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.7;
+    position: relative; z-index: 1;
+  }
+  .heartbeat-line {
+    display: flex; justify-content: center; align-items: center;
+    margin: 32px 0 0;
+    position: relative; z-index: 1;
+  }
+  .heartbeat-line svg { width: 200px; height: 48px; }
+  .hb-path {
+    stroke: var(--accent);
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: draw 2s ease forwards 0.5s;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  /* ——— FORM CONTAINER ——— */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ——— SECTIONS ——— */
+  .section {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .section:nth-child(1) { animation-delay: 0.1s; }
+  .section:nth-child(2) { animation-delay: 0.2s; }
+  .section:nth-child(3) { animation-delay: 0.3s; }
+  .section:nth-child(4) { animation-delay: 0.4s; }
+  @keyframes fadeUp { to { opacity: 1; transform: none; } }
+
+  .section-label {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+  }
+  .section-icon {
+    width: 36px; height: 36px;
+    background: #fde8e6;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--text);
+  }
+  .section-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ——— GRID ——— */
+  .grid { display: grid; gap: 20px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 560px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .section { padding: 24px 20px; }
+  }
+
+  /* ——— FIELD ——— */
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .field label span.req { color: var(--accent); }
+
+  /* Number input */
+  .field input[type="number"],
+  .field select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+  }
+  .field input[type="number"]:focus,
+  .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+  }
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); pointer-events: none; font-size: 14px;
+  }
+
+  /* Toggle pills */
+  .toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toggle-group input[type="radio"] { display: none; }
+  .toggle-group label.pill {
+    display: inline-block;
+    padding: 9px 18px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: none;
+    letter-spacing: 0;
+    background: var(--bg);
+    margin: 0;
+  }
+  .toggle-group input[type="radio"]:checked + label.pill {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+  }
+
+  /* Range slider */
+  .range-wrap { position: relative; padding-top: 4px; }
+  .range-wrap input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+  .range-wrap input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    background: var(--text);
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .range-wrap input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--accent);
+  }
+  .range-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted); margin-top: 6px;
+  }
+  .range-value {
+    display: inline-block;
+    background: var(--text);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 100px;
+    margin-top: 8px;
+  }
+
+  /* ——— SUBMIT BUTTON ——— */
+  .submit-wrap {
+    text-align: center;
+    margin-top: 32px;
+  }
+  .btn-submit {
+    background: var(--text);
+    color: #fff;
+    border: none;
+    padding: 18px 56px;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.3px;
+  }
+  .btn-submit:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(192,57,43,0.3);
+  }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit .btn-icon { margin-left: 8px; }
+
+  /* ——— RESULT CARD ——— */
+  #result {
+    display: none;
+    margin-top: 32px;
+    animation: fadeUp 0.6s ease forwards;
+  }
+  .result-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 40px;
+    box-shadow: 0 8px 40px rgba(26,18,8,0.12);
+    border: 1px solid var(--border);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--result-color, #888);
+  }
+  .result-emoji {
+    font-size: 56px;
+    display: block;
+    margin-bottom: 16px;
+    animation: pulse 1.5s ease infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  .result-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .result-subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 32px;
+  }
+
+  /* Gauge */
+  .gauge-container {
+    position: relative;
+    width: 200px;
+    height: 110px;
+    margin: 0 auto 24px;
+  }
+  .gauge-container svg { width: 100%; height: 100%; }
+  .gauge-track { fill: none; stroke: var(--border); stroke-width: 14; stroke-linecap: round; }
+  .gauge-fill {
+    fill: none;
+    stroke: var(--result-color, #888);
+    stroke-width: 14;
+    stroke-linecap: round;
+    stroke-dasharray: 251;
+    stroke-dashoffset: 251;
+    transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .gauge-label {
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .gauge-sub {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: -4px;
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  /* Risk badge */
+  .risk-badge {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 32px;
+    border: 2px solid var(--result-color);
+    color: var(--result-color);
+    background: color-mix(in srgb, var(--result-color) 10%, transparent);
+  }
+
+  /* Recommendations */
+  .recs {
+    text-align: left;
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 8px;
+  }
+  .recs h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .rec-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .rec-item:last-child { border-bottom: none; }
+  .rec-dot {
+    width: 8px; height: 8px;
+    background: var(--result-color, #888);
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+  .rec-text { font-size: 14px; line-height: 1.6; color: #2d2d2d; }
+  .rec-text strong { font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+
+  .disclaimer {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: #f5f3f0;
+    border-radius: 8px;
+    line-height: 1.6;
+  }
+
+  /* ——— LOADING ——— */
+  .loading { display: none; text-align: center; padding: 40px; }
+  .loading.active { display: block; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ——— TOOLTIP ——— */
+  .info-icon {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 16px; height: 16px;
+    background: var(--border);
+    color: var(--muted);
+    border-radius: 50%;
+    font-size: 10px;
+    cursor: help;
+    margin-left: 4px;
+    position: relative;
+    vertical-align: middle;
+  }
+  .info-icon:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+    z-index: 10;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+    transition: width 0.3s;
+    z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar" style="width:0%"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-pill">❤️ Heart Health Assessment</div>
+  <h1>Know Your<br><em>Heart's Story</em></h1>
+  <p>Answer a few simple questions about your health. Our AI model will estimate your risk profile and give personalised guidance.</p>
+  <div class="heartbeat-line">
+    <svg viewBox="0 0 200 48">
+      <polyline class="hb-path" points="0,24 30,24 45,8 55,40 65,4 75,44 85,24 115,24 130,14 140,34 150,24 200,24"/>
+    </svg>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="container">
+<form id="heartForm" onsubmit="return false;">
+
+  <!-- Section 1: About You -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-icon">👤</div>
+      <div>
+        <div class="section-title">About You</div>
+        <div class="section-sub">Basic demographics</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="field">
+        <label>Age <span class="req">*</span></label>
+        <div class="range-wrap">
+          <input type="range" id="age" min="20" max="90" value="45" oninput="updateRange(this,'ageVal')">
+          <div class="range-labels"><span>20</span><span>90</span></div>
+          <span class="range-value" id="ageVal">45 yrs</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Biological Sex <span class="req">*</span></label>
+        <div class="toggle-group">
+          <input type="radio" name="sex" id="sexM" value="1" checked>
+          <label class="pill" for="sexM">♂ Male</label>
+          <input type="radio" name="sex" id="sexF" value="0">
+          <label class="pill" for="sexF">♀ Female</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Symptoms -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-icon">🫀</div>
+      <div>
+        <div class="section-title">Symptoms & Sensations</div>
+        <div class="section-sub">What your body is telling you</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="field">
+        <label>Chest Pain Type <span class="req">*</span>
+          <span class="info-icon" data-tip="0=Asymptomatic  1=Atypical angina  2=Non-anginal  3=Typical angina">?</span>
+        </label>
+        <div class="select-wrap">
+          <select id="cp">
+            <option value="0">Asymptomatic</option>
+            <option value="1">Atypical Angina</option>
+            <option value="2">Non-Anginal Pain</option>
+            <option value="3" selected>Typical Angina</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Exercise-Induced Angina <span class="req">*</span></label>
+        <div class="toggle-group">
+          <input type="radio" name="exang" id="exY" value="1">
+          <label class="pill" for="exY">Yes</label>
+          <input type="radio" name="exang" id="exN" value="0" checked>
+          <label class="pill" for="exN">No</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Vitals -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-icon">📊</div>
+      <div>
+        <div class="section-title">Your Vitals</div>
+        <div class="section-sub">Numbers from your last check-up</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="field">
+        <label>Resting Blood Pressure <span class="req">*</span>
+          <span class="info-icon" data-tip="mm Hg at hospital admission. Normal: 90-120">?</span>
+        </label>
+        <div class="range-wrap">
+          <input type="range" id="trestbps" min="80" max="200" value="130" oninput="updateRange(this,'bpVal')">
+          <div class="range-labels"><span>80</span><span>200</span></div>
+          <span class="range-value" id="bpVal">130 mmHg</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Serum Cholesterol <span class="req">*</span>
+          <span class="info-icon" data-tip="mg/dl. Desirable: under 200">?</span>
+        </label>
+        <div class="range-wrap">
+          <input type="range" id="chol" min="100" max="600" value="240" oninput="updateRange(this,'cholVal')">
+          <div class="range-labels"><span>100</span><span>600</span></div>
+          <span class="range-value" id="cholVal">240 mg/dl</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Max Heart Rate Achieved <span class="req">*</span>
+          <span class="info-icon" data-tip="Max HR during exercise test. Higher is generally better.">?</span>
+        </label>
+        <div class="range-wrap">
+          <input type="range" id="thalach" min="60" max="220" value="150" oninput="updateRange(this,'hrVal')">
+          <div class="range-labels"><span>60</span><span>220</span></div>
+          <span class="range-value" id="hrVal">150 bpm</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>ST Depression (Oldpeak) <span class="req">*</span>
+          <span class="info-icon" data-tip="ST depression relative to rest. 0 = none.">?</span>
+        </label>
+        <div class="range-wrap">
+          <input type="range" id="oldpeak" min="0" max="6" step="0.1" value="1" oninput="updateRange(this,'stVal')">
+          <div class="range-labels"><span>0</span><span>6</span></div>
+          <span class="range-value" id="stVal">1.0</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Fasting Blood Sugar > 120 mg/dl <span class="req">*</span></label>
+        <div class="toggle-group">
+          <input type="radio" name="fbs" id="fbsY" value="1">
+          <label class="pill" for="fbsY">Yes (True)</label>
+          <input type="radio" name="fbs" id="fbsN" value="0" checked>
+          <label class="pill" for="fbsN">No (False)</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Clinical Tests -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-icon">🔬</div>
+      <div>
+        <div class="section-title">Clinical Test Results</div>
+        <div class="section-sub">From your medical records</div>
+      </div>
+    </div>
+    <div class="grid grid-3">
+      <div class="field">
+        <label>Resting ECG <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="restecg">
+            <option value="0" selected>Normal</option>
+            <option value="1">ST-T Abnormality</option>
+            <option value="2">Left Hypertrophy</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>ST Slope <span class="req">*</span>
+          <span class="info-icon" data-tip="Peak exercise ST segment slope">?</span>
+        </label>
+        <div class="select-wrap">
+          <select id="slope">
+            <option value="0">Downsloping</option>
+            <option value="1">Flat</option>
+            <option value="2" selected>Upsloping</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Major Vessels (Fluoroscopy) <span class="req">*</span>
+          <span class="info-icon" data-tip="0-3 vessels colored by fluoroscopy">?</span>
+        </label>
+        <div class="toggle-group">
+          <input type="radio" name="ca" id="ca0" value="0" checked>
+          <label class="pill" for="ca0">0</label>
+          <input type="radio" name="ca" id="ca1" value="1">
+          <label class="pill" for="ca1">1</label>
+          <input type="radio" name="ca" id="ca2" value="2">
+          <label class="pill" for="ca2">2</label>
+          <input type="radio" name="ca" id="ca3" value="3">
+          <label class="pill" for="ca3">3</label>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px;">
+      <div class="field">
+        <label>Thalassemia <span class="req">*</span></label>
+        <div class="toggle-group">
+          <input type="radio" name="thal" id="thal3" value="3" checked>
+          <label class="pill" for="thal3">3 — Normal</label>
+          <input type="radio" name="thal" id="thal6" value="6">
+          <label class="pill" for="thal6">6 — Fixed Defect</label>
+          <input type="radio" name="thal" id="thal7" value="7">
+          <label class="pill" for="thal7">7 — Reversable Defect</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="btn-submit" onclick="submitForm()">
+      Analyse My Heart Health <span class="btn-icon">→</span>
+    </button>
+  </div>
+
+</form>
+
+<!-- Loading -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <p style="color:var(--muted); font-size:15px;">Running analysis…</p>
+</div>
+
+<!-- RESULT -->
+<div id="result">
+  <div class="result-card" id="resultCard">
+    <span class="result-emoji" id="resultEmoji">❤️</span>
+    <h2 id="resultTitle">Your Result</h2>
+    <p class="result-subtitle" id="resultSubtitle"></p>
+
+    <div class="gauge-container" id="gaugeWrap">
+      <svg viewBox="0 0 200 110">
+        <!-- half-circle arc: r=80, center 100,100 -->
+        <path class="gauge-track" d="M 20,100 A 80,80 0 0 1 180,100"/>
+        <path class="gauge-fill" id="gaugeFill" d="M 20,100 A 80,80 0 0 1 180,100"/>
+      </svg>
+      <div class="gauge-label" id="gaugeLabel">0%</div>
+    </div>
+    <span class="gauge-sub">Likelihood of Heart Disease</span>
+    <div class="risk-badge" id="riskBadge">—</div>
+
+    <div class="recs" id="recsDiv">
+      <h3>🩺 Personalised Recommendations</h3>
+      <div id="recsList"></div>
+    </div>
+
+    <div class="disclaimer">
+      ⚠️ This tool is for informational purposes only and does not constitute medical advice. Please consult a qualified healthcare professional for diagnosis and treatment.
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+/* Range update helpers */
+function updateRange(el, labelId) {
+  const v = parseFloat(el.value);
+  const units = {
+    age: ' yrs', trestbps: ' mmHg', chol: ' mg/dl', thalach: ' bpm',
+    oldpeak: ''
+  };
+  const unit = units[el.id] ?? '';
+  document.getElementById(labelId).textContent = v.toFixed(el.step == '0.1' ? 1 : 0) + unit;
+  updateProgress();
+}
+
+/* Progress bar */
+function updateProgress() {
+  const fields = ['age','trestbps','chol','thalach','oldpeak'];
+  const radios = ['sex','exang','fbs','ca','thal'];
+  const selects = ['cp','restecg','slope'];
+  let filled = 0, total = fields.length + radios.length + selects.length;
+  fields.forEach(f => { if (document.getElementById(f).value) filled++; });
+  radios.forEach(r => { if (document.querySelector(`input[name="${r}"]:checked`)) filled++; });
+  selects.forEach(s => { if (document.getElementById(s).value !== '') filled++; });
+  document.getElementById('progressBar').style.width = (filled/total*100)+'%';
+}
+
+/* Collect form values */
+function getValues() {
+  const v = n => parseFloat(document.getElementById(n).value);
+  const r = n => parseFloat(document.querySelector(`input[name="${n}"]:checked`)?.value ?? 0);
+  return [v('age'), r('sex'), v('cp'), v('trestbps'), v('chol'), r('fbs'),
+          v('restecg'), v('thalach'), r('exang'), v('oldpeak'),
+          v('slope'), r('ca'), r('thal')];
+}
+
+/* ——— MOCK PREDICT ———
+   In production, replace this with a real fetch() to your Flask/FastAPI backend:
+
+   const response = await fetch('/predict', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ features: values })
+   });
+   const data = await response.json();
+   const prob = data.probability; // 0..1
+*/
+
+/* Risk colours & thresholds */
+function riskInfo(p) {
+  if (p < 0.3)  return { label: 'Low Risk',      color: '#27ae60', emoji: '💚', tier: 0 };
+  if (p < 0.55) return { label: 'Moderate Risk', color: '#f39c12', emoji: '💛', tier: 1 };
+  if (p < 0.75) return { label: 'High Risk',     color: '#e67e22', emoji: '🧡', tier: 2 };
+  return               { label: 'Very High Risk', color: '#c0392b', emoji: '❤️‍🔥', tier: 3 };
+}
+
+/* Recommendations per tier */
+const recTiers = [
+  [
+    { t: 'Keep it up!', b: 'Your numbers suggest a healthy heart profile. Maintain regular exercise (150 min/week of moderate aerobic activity) and a balanced diet.' },
+    { t: 'Annual check-ups', b: 'Continue scheduling yearly heart health screenings even with low risk, especially as you age.' },
+    { t: 'Preventive lifestyle', b: 'Avoid smoking, limit alcohol, manage stress, and stay at a healthy weight to keep risk low.' },
+    { t: 'Monitor blood pressure', b: 'Keep resting BP below 120/80 mmHg through diet and exercise.' },
+  ],
+  [
+    { t: 'See your doctor soon', b: 'Moderate risk indicators were detected. Schedule an appointment with your GP or cardiologist within the next month.' },
+    { t: 'Diet changes matter', b: 'Reduce saturated fats, sodium, and processed foods. Increase fibre, vegetables, and omega-3 rich fish.' },
+    { t: 'Exercise carefully', b: 'Aim for 30 minutes of moderate activity most days. If you feel chest pain during exercise, stop and seek medical advice.' },
+    { t: 'Manage contributing factors', b: 'If you have diabetes or high blood pressure, work with your doctor to keep them well-controlled.' },
+    { t: 'Medication review', b: 'Your doctor may recommend preventive medications like statins or aspirin — discuss your options.' },
+  ],
+  [
+    { t: 'Seek medical attention promptly', b: 'Your risk profile is elevated. Book an appointment with a cardiologist as soon as possible for a thorough evaluation.' },
+    { t: 'Cardiac investigations', b: 'Your doctor may recommend an ECG, stress test, echocardiogram, or coronary angiography to assess your heart in detail.' },
+    { t: 'Urgent lifestyle changes', b: 'Quit smoking immediately, minimise alcohol, and follow a heart-healthy (Mediterranean-style) diet closely.' },
+    { t: 'Know warning signs', b: 'Learn the symptoms of a heart attack: chest tightness, pain radiating to the arm/jaw, shortness of breath, sweating. Call emergency services immediately if they occur.' },
+    { t: 'Reduce stressors', b: 'Chronic stress elevates cortisol and damages blood vessels. Consider meditation, therapy, or other stress-reduction techniques.' },
+  ],
+  [
+    { t: '🚨 Consult a cardiologist urgently', b: 'Your indicators suggest very high risk. Please seek specialist cardiac care as soon as possible — do not delay.' },
+    { t: 'Emergency awareness', b: 'Know your local emergency number and the nearest hospital with cardiac facilities. Tell people close to you about your condition.' },
+    { t: 'Strict medical management', b: 'Follow all prescribed medications precisely. Do not skip doses. Ask your doctor about cardiac rehabilitation programmes.' },
+    { t: 'Supervised exercise only', b: 'Only exercise under medical supervision. Unsupervised strenuous activity can be dangerous at this risk level.' },
+    { t: 'Comprehensive risk factor control', b: 'Aggressively manage blood pressure, cholesterol, blood sugar, weight, and smoking with professional guidance.' },
+    { t: 'Support network', b: 'Let family or close friends know about your health status so they can assist in an emergency.' },
+  ]
+];
+
+/* Animate gauge */
+function animateGauge(prob, color) {
+  const fill = document.getElementById('gaugeFill');
+  const label = document.getElementById('gaugeLabel');
+  const arcLen = 251; // approximate arc length for our half circle
+  const offset = arcLen * (1 - prob);
+  fill.style.stroke = color;
+  fill.style.strokeDashoffset = offset;
+
+  let current = 0;
+  const target = Math.round(prob * 100);
+  const step = () => {
+    if (current < target) {
+      current++;
+      label.textContent = current + '%';
+      requestAnimationFrame(step);
+    }
+  };
+  requestAnimationFrame(step);
+}
+
+/* Main submit */
+async function submitForm() {
+  const values = getValues();
+  const loading = document.getElementById('loading');
+  const resultDiv = document.getElementById('result');
+
+  resultDiv.style.display = 'none';
+  loading.classList.add('active');
+  loading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Simulate async model call (replace with real fetch)
+  await new Promise(r => setTimeout(r, 1400));
+  const res = await fetch('http://127.0.0.1:5000/predict', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({features: values}) });
+  const { probability: prob } = await res.json();
+  const info = riskInfo(prob);
+
+  loading.classList.remove('active');
+
+  // Build result card
+  const card = document.getElementById('resultCard');
+  card.style.setProperty('--result-color', info.color);
+
+  document.getElementById('resultEmoji').textContent = info.emoji;
+  document.getElementById('resultTitle').textContent =
+    prob < 0.5 ? 'Heart Disease Unlikely' : 'Heart Disease Likely';
+  document.getElementById('resultSubtitle').textContent =
+    `Based on your inputs, our model estimates a ${Math.round(prob*100)}% probability of heart disease.`;
+
+  document.getElementById('riskBadge').textContent = info.label;
+  document.getElementById('riskBadge').style.setProperty('--result-color', info.color);
+  document.getElementById('riskBadge').style.borderColor = info.color;
+  document.getElementById('riskBadge').style.color = info.color;
+  document.getElementById('riskBadge').style.background = info.color + '18';
+
+  // Recs
+  const list = document.getElementById('recsList');
+  list.innerHTML = '';
+  recTiers[info.tier].forEach(rec => {
+    list.innerHTML += `
+      <div class="rec-item">
+        <div class="rec-dot" style="background:${info.color}"></div>
+        <div class="rec-text"><strong>${rec.t}</strong>${rec.b}</div>
+      </div>`;
+  });
+
+  resultDiv.style.display = 'block';
+  resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  setTimeout(() => animateGauge(prob, info.color), 300);
+
+  document.getElementById('progressBar').style.background = info.color;
+}
+
+updateProgress();
+</script>
+</body>
+</html>
