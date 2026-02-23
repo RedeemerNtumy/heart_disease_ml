@@ -719,6 +719,7 @@
 
     <div class="disclaimer">
       ⚠️ This tool is for informational purposes only and does not constitute medical advice. Please consult a qualified healthcare professional for diagnosis and treatment.
+      <a href="https://github.com/RedeemerNtumy/heart_disease_ml">Access the project here</a>
     </div>
   </div>
 </div>
@@ -759,19 +760,6 @@ function getValues() {
           v('slope'), r('ca'), r('thal')];
 }
 
-/* ——— MOCK PREDICT ———
-   In production, replace this with a real fetch() to your Flask/FastAPI backend:
-
-   const response = await fetch('/predict', {
-     method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ features: values })
-   });
-   const data = await response.json();
-   const prob = data.probability; // 0..1
-*/
-
-/* Risk colours & thresholds */
 function riskInfo(p) {
   if (p < 0.3)  return { label: 'Low Risk',      color: '#27ae60', emoji: '💚', tier: 0 };
   if (p < 0.55) return { label: 'Moderate Risk', color: '#f39c12', emoji: '💛', tier: 1 };
