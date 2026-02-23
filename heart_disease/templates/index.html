@@ -468,6 +468,31 @@
     transition: width 0.3s;
     z-index: 100;
   }
+  /* GitHub link in hero */
+  .github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(26,18,8,0.06);
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background 0.18s, transform 0.12s, box-shadow 0.12s;
+  }
+  .github-link .gh-mark { font-size: 18px; line-height: 1; }
+  .github-link:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(192,57,43,0.18);
+  }
+  .github-link:focus {
+    outline: 3px solid rgba(192,57,43,0.14);
+    outline-offset: 2px;
+  }
 </style>
 </head>
 <body>
@@ -479,6 +504,12 @@
   <div class="hero-pill">❤️ Heart Health Assessment</div>
   <h1>Know Your<br><em>Heart's Story</em></h1>
   <p>Answer a few simple questions about your health. Our AI model will estimate your risk profile and give personalised guidance.</p>
+  <p>Explore the project on
+    <a class="github-link" href="https://github.com/RedeemerNtumy/heart_disease_ml" target="_blank" rel="noopener noreferrer" aria-label="Open project on GitHub (opens in new tab)">
+      <span class="gh-mark" aria-hidden="true">🐙</span>
+      <span>GitHub</span>
+    </a>
+  </p>
   <div class="heartbeat-line">
     <svg viewBox="0 0 200 48">
       <polyline class="hb-path" points="0,24 30,24 45,8 55,40 65,4 75,44 85,24 115,24 130,14 140,34 150,24 200,24"/>
@@ -509,7 +540,7 @@
         </div>
       </div>
       <div class="field">
-        <label>Biological Sex <span class="req">*</span></label>
+        <label>Sex <span class="req">*</span></label>
         <div class="toggle-group">
           <input type="radio" name="sex" id="sexM" value="1" checked>
           <label class="pill" for="sexM">♂ Male</label>
