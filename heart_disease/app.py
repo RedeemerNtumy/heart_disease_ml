@@ -4,7 +4,7 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app,origins=["https://heartdiseasepredictorml.netlify.app"])
 
 model = joblib.load("assets/gs_knn.joblib")
 
